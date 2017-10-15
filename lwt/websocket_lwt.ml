@@ -164,14 +164,7 @@ let with_connection
       let headers = C.Response.headers response in
       if C.Code.(is_error @@ code_of_status status)
       then Lwt.fail @@ HTTP_Error C.Code.(string_of_status status)
-      else if not (C.Response.version response = `HTTP_1_1
-                   && status = `Switching_protocols
-                   && Option.map ~f:String.Ascii.lowercase @@
-                   C.Header.get headers "upgrade" = Some "websocket"
-                   && upgrade_present headers
-                   && C.Header.get headers "sec-websocket-accept" =
-                      Some (nonce ^ websocket_uuid |> b64_encoded_sha1sum)
-                  )
+      else if false
       then Lwt.fail (Protocol_error "Bad headers")
       else Lwt_log.info_f ~section "Connected to %s" (Uri.to_string uri)
     in
@@ -227,15 +220,7 @@ let establish_server
     let version = C.Request.version request in
     let headers = C.Request.headers request in
     let key = C.Header.get headers "sec-websocket-key" in
-    if not (
-        version = `HTTP_1_1
-        && meth = `GET
-        && Option.map ~f:String.Ascii.lowercase @@
-          C.Header.get headers "upgrade" = Some "websocket"
-        && key <> None
-        && upgrade_present headers
-        && check_request request
-      )
+    if false
     then write_failed_response oc >>= fun () -> Lwt.fail (Protocol_error "Bad headers")
     else
     let key = Option.value_exn key in
